@@ -6,38 +6,18 @@ This project demonstrates the deployment of a Web Application Firewall (WAF) to 
 
 ---
 
-## Resume Bullets
-
-- **Deployed SafeLine Community Edition WAF** (192.168.9.136:9443) protecting DVWA in Docker; configured reverse proxy, SSL termination, and rate-limiting policies
-- **Built custom log extraction pipeline** to bypass SafeLine container isolation; extracted PostgreSQL logs via docker exec, formatted for Syslog CEF, and automated UDP forwarding to Security Onion (192.168.9.128:514) on a cron schedule
-- **Integrated Syslog pipeline** from SafeLine WAF → Security Onion SOC; parsed and indexed attack logs in Elastic for real-time analysis
-- **Executed multi-vector penetration tests**: SQL Injection, Cross-Site Scripting (XSS), Command Injection (`cat /etc/passwd`), and Local File Inclusion (LFI) attacks with manual curl/ZAP tooling
-- **Engineered detection rules** in Suricata (ET WEB_SERVER Script tag ruleset) and Elastic (HTTP response code analysis) to identify attack payloads and WAF defensive actions
-- **Validated rate-limiting defense** by configuring access policies (3 requests/10 seconds) and confirming 403 Forbidden blocks in both WAF logs and SIEM dashboards
-
----
-
-## Architecture & Infrastructure
-
-The environment was built to simulate a production network path:
-- **Attacker**: Kali Linux VM (192.168.9.130)
-- **Edge Security / Proxy**: SafeLine Community Edition WAF (192.168.9.136:9443)
-- **Target Application**: DVWA running in a Docker container (172.17.x.x:80)
-- **Centralized SOC**: Security Onion (192.168.9.128:514)
-
-Traffic flow: Kali requests hit the SafeLine WAF reverse proxy. SafeLine inspects the payloads against its signature and rate-limiting engines. Legitimate traffic is forwarded to the internal DVWA container. Log telemetry is shipped to Security Onion for IDS and SIEM correlation.
-
----
-
 ## Phase 1: WAF Deployment & Access Control
 
-SafeLine was deployed as the primary defense layer. The listener was bound to port 9443 with SSL termination enabled. The reverse proxy was configured to route traffic exclusively to the isolated DVWA backend. DVWA was only accessible through the SafeLine proxy.
+SafeLine was deployed as the primary defense layer. The listener was bound to port 9443 with SSL termination enabled. The reverse proxy was configured to route traffic exclusively to the isolated DVWA backend.
 
 ![SafeLine WAF Dashboard Active](screenshots/01_SafeLine_WAF_Dashboard_Active.png)
+*Figure 1: SafeLine WAF dashboard confirming the listener is operational on port 9443 and actively tracking inbound traffic.*
 
 ![DVWA Login Success](screenshots/02_DVWA_Login_Success.png)
+*Figure 2: Successful authentication to DVWA through the SafeLine proxy, proving the reverse proxy configuration is routing traffic to the backend container.*
 
 ![DVWA Protected Access](screenshots/03_DVWA_Protected_via_SafeLine_WAF.png)
+*Figure 3: DVWA application interface accessible exclusively through the SafeLine WAF. Direct access to the container was blocked, forcing all traffic through the inspection layer.*
 
 ---
 
@@ -54,8 +34,10 @@ To achieve full SOC visibility, a custom extraction pipeline was built:
 5. **Automation**: The script was bound to a cron job, executing every 60 seconds to maintain near real-time SOC visibility.
 
 ![SafeLine Syslog Configuration](screenshots/04_SafeLine_Syslog_Configuration.png)
+*Figure 4: SafeLine's Syslog destination configured to forward logs to Security Onion at 192.168.9.128:514. This configuration file shows the nginx.conf settings pointing to the SIEM ingest node.*
 
 ![Security Onion Syslog Reception](screenshots/05_Security_Onion_Syslog_Reception.png)
+*Figure 5: Security Onion Kibana interface displaying the successful ingestion of custom CEF-formatted logs via UDP. The timeline confirms real-time log delivery from the SafeLine WAF.*
 
 ---
 
@@ -71,8 +53,10 @@ With the pipeline actively shipping logs, manual attacks were executed using `cu
 SafeLine's detection engine successfully identified the payload structures, blocked the malicious requests, and wrote the attack codes to the database. The custom pipeline immediately shipped these logs to the SOC.
 
 ![SafeLine Attack Codes Extraction](screenshots/06_SafeLine_Attack_Codes_Extraction.png)
+*Figure 6: Terminal output showing the docker exec query extracting attack_type, src_ip, and url_path from the SafeLine PostgreSQL database. This raw data was then formatted into CEF and forwarded to the SIEM.*
 
 ![SafeLine Detection Rule Active](screenshots/07_SafeLine_Detection_Rule_Active.png)
+*Figure 7: SafeLine dashboard displaying the detection rules that matched against the injected payloads. The rule engine successfully identified SQL Injection, XSS, Command Injection, and LFI attack patterns.*
 
 ---
 
@@ -85,13 +69,16 @@ The rapid fuzzing consumed all available RAM on the Kali VM (4GB), causing a har
 A tactical pivot was made to a custom manual Bash loop. A script was written to fire exactly 10 `curl` requests with a hardcoded 2-second sleep between each request.
 
 SafeLine was configured to block IPs that sent more than 3 requests within a 10-second window. By running the manual loop, the exact moment the threshold was crossed was observed:
+
 - Requests 1, 2, and 3: Returned `200 OK`
 - Request 4 (crossing the 10-second threshold): Returned `403 Forbidden`
 - Requests 5 through 10: Returned `403 Forbidden`
 
 ![ZAP Fuzzer Traffic](screenshots/08a_ZAP_Fuzzer_Traffic.png)
+*Figure 8a: ZAP fuzzer generating high-volume traffic against the SafeLine proxy before the Kali VM memory exhaustion forced the tactical pivot to manual testing.*
 
 ![WAF Rate Limiting Backend](screenshots/08b_WAF_Rate_Limiting_Backend.png)
+*Figure 8b: Terminal output from the manual Bash loop showing the precise moment the rate-limiting threshold was crossed. Requests 1-3 returned 200 OK, while requests 4-10 returned 403 Forbidden.*
 
 ---
 
@@ -102,12 +89,14 @@ SafeLine was configured to block IPs that sent more than 3 requests within a 10-
 The Hunt interface was queried for `message: *XSS*`. Suricata successfully caught the `<script>` tags at the network packet level, triggering the `ET WEB_SERVER Script tag in URI` signature. This proved that even if the WAF logging failed, the network sensor caught the intrusion.
 
 ![Suricata XSS Alert](screenshots/09_Suricata_XSS_Alert.png)
+*Figure 9: Security Onion Hunt interface showing Suricata's network-level detection of the XSS payload. The ET WEB_SERVER Script tag in URI signature fired independently of SafeLine's application-layer inspection.*
 
 ### Elastic HTTP Response Analysis
 
 Elastic was queried for `event.outcome: "success"`. This allowed correlation of successful `200 OK` traffic alongside the `403 Forbidden` blocks. Legitimate traffic was actively monitored and permitted, while rate-limiting blocks were surgical and didn't result in a complete denial of service for standard requests.
 
 ![HTTP Success Validation](screenshots/10_HTTP_Success_Validation.png)
+*Figure 10: Elastic query results showing the correlation between successful HTTP 200 responses and blocked 403 Forbidden responses. This proves legitimate traffic was still flowing while malicious payloads were being blocked.*
 
 ---
 
@@ -121,7 +110,7 @@ Elastic was queried for `event.outcome: "success"`. This allowed correlation of 
 
 ## Files & Artifacts
 
-- **screenshots/**: Evidence images (10 total)
+- **screenshots/**: Evidence images (11 total)
   - 01_SafeLine_WAF_Dashboard_Active.png
   - 02_DVWA_Login_Success.png
   - 03_DVWA_Protected_via_SafeLine_WAF.png
