@@ -1,4 +1,4 @@
-# Project: Web Application Security: WAF Deployment & SIEM Integration
+# Web Application Security: WAF Deployment & SIEM Integration
 
 ## Project Overview
 
@@ -31,16 +31,13 @@ Traffic flow: Kali requests hit the SafeLine WAF reverse proxy. SafeLine inspect
 
 ## Phase 1: WAF Deployment & Access Control
 
-SafeLine was deployed as the primary defense layer. The listener was bound to port 9443 with SSL termination enabled. The reverse proxy was configured to route traffic exclusively to the isolated DVWA backend.
+SafeLine was deployed as the primary defense layer. The listener was bound to port 9443 with SSL termination enabled. The reverse proxy was configured to route traffic exclusively to the isolated DVWA backend. DVWA was only accessible through the SafeLine proxy.
 
 ![SafeLine WAF Dashboard Active](screenshots/01_SafeLine_WAF_Dashboard_Active.png)
-*SafeLine listener operational and tracking inbound traffic.*
 
 ![DVWA Login Success](screenshots/02_DVWA_Login_Success.png)
-*Successful login to DVWA through the SafeLine proxy.*
 
 ![DVWA Protected Access](screenshots/03_DVWA_Protected_via_SafeLine_WAF.png)
-*DVWA login interface accessible only through the WAF proxy.*
 
 ---
 
@@ -57,10 +54,8 @@ To achieve full SOC visibility, a custom extraction pipeline was built:
 5. **Automation**: The script was bound to a cron job, executing every 60 seconds to maintain near real-time SOC visibility.
 
 ![SafeLine Syslog Configuration](screenshots/04_SafeLine_Syslog_Configuration.png)
-*SafeLine Syslog destination settings pointing to Security Onion.*
 
 ![Security Onion Syslog Reception](screenshots/05_Security_Onion_Syslog_Reception.png)
-*Security Onion Kibana interface confirming the successful ingestion of custom CEF-formatted logs via UDP.*
 
 ---
 
@@ -76,10 +71,8 @@ With the pipeline actively shipping logs, manual attacks were executed using `cu
 SafeLine's detection engine successfully identified the payload structures, blocked the malicious requests, and wrote the attack codes to the database. The custom pipeline immediately shipped these logs to the SOC.
 
 ![SafeLine Attack Codes Extraction](screenshots/06_SafeLine_Attack_Codes_Extraction.png)
-*SafeLine categorizing the exact attack vectors injected.*
 
 ![SafeLine Detection Rule Active](screenshots/07_SafeLine_Detection_Rule_Active.png)
-*Confirmation of the WAF rule matching engine engaging against the payloads.*
 
 ---
 
@@ -97,10 +90,8 @@ SafeLine was configured to block IPs that sent more than 3 requests within a 10-
 - Requests 5 through 10: Returned `403 Forbidden`
 
 ![ZAP Fuzzer Traffic](screenshots/08a_ZAP_Fuzzer_Traffic.png)
-*The initial ZAP automated scan traffic prior to the Kali memory exhaustion.*
 
 ![WAF Rate Limiting Backend](screenshots/08b_WAF_Rate_Limiting_Backend.png)
-*The 403 Forbidden blocks triggered during the controlled rate-limiting validation loop.*
 
 ---
 
@@ -111,14 +102,12 @@ SafeLine was configured to block IPs that sent more than 3 requests within a 10-
 The Hunt interface was queried for `message: *XSS*`. Suricata successfully caught the `<script>` tags at the network packet level, triggering the `ET WEB_SERVER Script tag in URI` signature. This proved that even if the WAF logging failed, the network sensor caught the intrusion.
 
 ![Suricata XSS Alert](screenshots/09_Suricata_XSS_Alert.png)
-*Suricata firing on the XSS payload independent of SafeLine's application-layer inspection.*
 
 ### Elastic HTTP Response Analysis
 
 Elastic was queried for `event.outcome: "success"`. This allowed correlation of successful `200 OK` traffic alongside the `403 Forbidden` blocks. Legitimate traffic was actively monitored and permitted, while rate-limiting blocks were surgical and didn't result in a complete denial of service for standard requests.
 
 ![HTTP Success Validation](screenshots/10_HTTP_Success_Validation.png)
-*Elastic dashboard validating the ratio of successful traffic versus blocked attacks.*
 
 ---
 
@@ -132,7 +121,7 @@ Elastic was queried for `event.outcome: "success"`. This allowed correlation of 
 
 ## Files & Artifacts
 
-- **screenshots/**: Evidence images (11 total)
+- **screenshots/**: Evidence images (10 total)
   - 01_SafeLine_WAF_Dashboard_Active.png
   - 02_DVWA_Login_Success.png
   - 03_DVWA_Protected_via_SafeLine_WAF.png
