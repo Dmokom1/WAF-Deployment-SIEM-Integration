@@ -47,24 +47,27 @@ This project helped me understand that WAF testing is not only about whether an 
 
 ```mermaid
 graph TD
-    A[Attack Simulation] --> B[Credential Access]
-    B --> C[Golden Ticket Creation]
-    C --> D[Authentication Bypass]
-    D --> E[Privileged Access]
-    E --> F[Detection & Investigation]
-    F --> G[Remediation]
+    subgraph "Attack Simulation"
+        A[Kali Linux] --> B[Web Attacks]
+        B --> C[DVWA]
+    end
     
-    H[Windows Server 2022 DC] --> I[Active Directory]
-    I --> J[Kerberos Authentication]
-    J --> K[SIEM Integration]
+    subgraph "Protection Layer"
+        D[SafeLine WAF]
+        E[Log Generation]
+    end
     
-    L[Forensic Tools] --> M[FTK Imager]
-    L --> N[Volatility 3]
-    L --> O[DB Browser for SQLite]
+    subgraph "SIEM & Detection"
+        F[Security Onion]
+        G[Elastic/Kibana]
+        H[Custom WAF Rules]
+    end
     
-    P[Defender Perspective] --> Q[Event Log Analysis]
-    P --> R[Memory Forensics]
-    P --> S[Browser Artifact Review]
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
 ```
 
 *Note: This diagram represents the lab environment and investigation workflow.*
