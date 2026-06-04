@@ -5,24 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2024-08-05
 
 ### Added
-- Initial repository structure
-- Comprehensive README documentation
-- Screenshot evidence from lab exercises
-- LICENSE and .gitignore files
-- CHANGELOG for tracking changes
+- WAF deployment and configuration (ModSecurity)
+- SIEM integration for WAF log analysis
+- Detection rules for web application attacks
+- Alert correlation between WAF and SIEM
+- Performance tuning documentation
 
 ### Changed
-- Standardized file naming conventions
-- Enhanced README with first-person narrative
-- Added architecture overview section
-- Improved documentation structure
+- Optimized WAF rule sets for production use
+- Improved SIEM parsing configurations
+- Enhanced documentation with deployment examples
 
 ### Fixed
-- N/A (initial release)
+- Resolved log format compatibility issues
+- Fixed alert duplication in SIEM correlation
+- Corrected false positive tuning parameters
 
-## Notes
-This project documents hands-on lab work for cybersecurity skill development.
-All activities were performed in isolated lab environments for educational purposes.
+## [0.3.0] - 2024-07-12
+
+### Added
+- Initial WAF configuration
+- Basic SIEM integration
+- Attack simulation scenarios
