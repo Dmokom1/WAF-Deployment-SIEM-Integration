@@ -43,6 +43,34 @@ This project helped me understand that WAF testing is not only about whether an 
 
 ## Lab Environment
 
+
+## Architecture
+
+```mermaid
+graph TD
+    A[Attack Simulation] --> B[Credential Access]
+    B --> C[Golden Ticket Creation]
+    C --> D[Authentication Bypass]
+    D --> E[Privileged Access]
+    E --> F[Detection & Investigation]
+    F --> G[Remediation]
+    
+    H[Windows Server 2022 DC] --> I[Active Directory]
+    I --> J[Kerberos Authentication]
+    J --> K[SIEM Integration]
+    
+    L[Forensic Tools] --> M[FTK Imager]
+    L --> N[Volatility 3]
+    L --> O[DB Browser for SQLite]
+    
+    P[Defender Perspective] --> Q[Event Log Analysis]
+    P --> R[Memory Forensics]
+    P --> S[Browser Artifact Review]
+```
+
+*Note: This diagram represents the lab environment and investigation workflow.*
+
+
 | Component | Details |
 |---|---|
 | Attacker / Test Host | Kali Linux |
@@ -95,7 +123,7 @@ SafeLine WAF was active in the lab environment.
 
 ![SafeLine WAF Dashboard Active](screenshots/01_SafeLine_WAF_Dashboard_Active.png)
 
-### What this proved
+## What this proved
 
 This confirmed that the SafeLine WAF dashboard was reachable and the WAF service was running.
 
@@ -107,7 +135,7 @@ DVWA was also reachable in the lab.
 
 ![DVWA Login Success](screenshots/02_DVWA_Login_Success.png)
 
-### What this proved
+## What this proved
 
 This confirmed that the vulnerable web application was accessible and ready for testing.
 
@@ -119,7 +147,7 @@ DVWA access was also validated through the SafeLine-protected path.
 
 ![DVWA Protected via SafeLine WAF](screenshots/03_DVWA_Protected_via_SafeLine_WAF.png)
 
-### What this proved
+## What this proved
 
 This confirmed that DVWA could be reached through the SafeLine-facing application path.
 
@@ -133,7 +161,7 @@ SafeLine-related logging was configured to forward syslog data toward the SIEM.
 
 ![SafeLine Syslog Configuration](screenshots/04_SafeLine_Syslog_Configuration.png)
 
-### What this proved
+## What this proved
 
 This screenshot shows Nginx logging configured to send syslog data to a remote destination.
 
@@ -149,7 +177,7 @@ Security Onion showed received syslog events.
 
 ![Security Onion Syslog Reception](screenshots/05_Security_Onion_Syslog_Reception.png)
 
-### What this proved
+## What this proved
 
 Security Onion showed `syslog.syslog` events in the Hunt interface.
 
@@ -163,7 +191,7 @@ SafeLine attack records were queried directly from the PostgreSQL container.
 
 ![SafeLine Attack Codes Extraction](screenshots/06_SafeLine_Attack_Codes_Extraction.png)
 
-### Query Reviewed
+## Query Reviewed
 
 ```sql
 SELECT attack_type, src_ip, url_path
@@ -172,7 +200,7 @@ ORDER BY id DESC
 LIMIT 4;
 ```
 
-### What this proved
+## What this proved
 
 The query returned SafeLine attack records containing:
 
@@ -203,7 +231,7 @@ An Elastic detection rule was configured to match selected SafeLine attack-type 
 
 ![Elastic Detection Rule Configuration](screenshots/07_Elastic_Detection_Rule_Configuration.png)
 
-### Rule Logic
+## Rule Logic
 
 The custom query matched these message patterns:
 
@@ -214,7 +242,7 @@ message: "attack_type: 9" OR
 message: "attack_type: 11"
 ```
 
-### What this proved
+## What this proved
 
 This screenshot confirmed that an Elastic rule was created to search for selected SafeLine attack-type codes.
 
@@ -237,7 +265,7 @@ OWASP ZAP was used to generate automated web testing traffic against the SafeLin
 
 ![ZAP Fuzzer Traffic](screenshots/08a_ZAP_Fuzzer_Traffic.png)
 
-### What this proved
+## What this proved
 
 The screenshot shows a completed ZAP automated scan against:
 
@@ -260,7 +288,7 @@ SafeLine rate-limiting behavior was reviewed after repeated web requests.
 
 ![WAF Rate Limiting Backend](screenshots/08b_WAF_Rate_Limiting_Backend.png)
 
-### What this proved
+## What this proved
 
 The SafeLine rate-limiting page showed entries for:
 
@@ -286,7 +314,7 @@ Security Onion Hunt was used to search for XSS-related activity.
 
 ![Suricata XSS Alert](screenshots/09_Suricata_XSS_Alert.png)
 
-### What this proved
+## What this proved
 
 The Hunt query searched for:
 
@@ -308,7 +336,7 @@ Security Onion Hunt was also used to review successful event activity.
 
 ![HTTP Success Validation](screenshots/10_HTTP_Success_Validation.png)
 
-### What this proved
+## What this proved
 
 The Hunt query searched for:
 
@@ -429,3 +457,25 @@ If I expanded this project, I would improve it by:
 | `screenshots/08b_WAF_Rate_Limiting_Backend.png` | SafeLine rate-limiting entries and block action |
 | `screenshots/09_Suricata_XSS_Alert.png` | Security Onion Hunt query for XSS-related activity |
 | `screenshots/10_HTTP_Success_Validation.png` | Security Onion Hunt query for successful event activity |
+
+---
+
+## Repository Information
+
+**Project**: WAF-Deployment-SIEM-Integration
+**Author**: Dmokom1  
+**Purpose**: Hands-on cybersecurity lab for skill development
+**Environment**: Isolated home lab with Windows Server 2022 DC
+**Tools**: See "Tools Used" section above
+
+### Usage Notes:
+- This repository documents a learning exercise, not production code
+- All screenshots are from controlled lab environments
+- Techniques demonstrated are for educational purposes only
+- Always follow organizational policies and legal guidelines
+
+### Contributing:
+While this is primarily a personal learning portfolio, suggestions and feedback are welcome. Please open an issue to discuss improvements.
+
+### License:
+MIT License - see [LICENSE](LICENSE) file for details.
