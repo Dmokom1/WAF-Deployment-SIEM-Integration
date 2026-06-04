@@ -4,7 +4,7 @@ This project was completed in an isolated web security lab built for WAF testing
 
 ---
 
-## Overview
+## Project Overview
 
 This project focuses on protecting a vulnerable web application with SafeLine WAF and reviewing the security telemetry created during web attack testing.
 
@@ -23,7 +23,7 @@ The project also included OWASP ZAP testing and SafeLine rate-limiting review to
 
 ---
 
-## Why I Built This
+## Why I Built This Project
 
 Web application attacks are common, but the important defensive skill is understanding how the activity appears in logs and security tools.
 
@@ -41,8 +41,7 @@ This project helped me understand that WAF testing is not only about whether an 
 
 ---
 
-## Lab Environment
-
+## Lab Environment & Architecture
 
 ## Architecture
 
@@ -66,10 +65,9 @@ graph TD
     P[Defender Perspective] --> Q[Event Log Analysis]
     P --> R[Memory Forensics]
     P --> S[Browser Artifact Review]
-```
+```eql
 
 *Note: This diagram represents the lab environment and investigation workflow.*
-
 
 | Component | Details |
 |---|---|
@@ -84,7 +82,7 @@ graph TD
 
 ---
 
-## Tools Used
+## Tools & Technologies Used
 
 | Tool | Purpose |
 |---|---|
@@ -121,7 +119,7 @@ The project followed this sequence:
 
 SafeLine WAF was active in the lab environment.
 
-![SafeLine WAF Dashboard Active](screenshots/01_SafeLine_WAF_Dashboard_Active.png)
+![Lab Screenshot](screenshots/01_SafeLine_WAF_Dashboard_Active.png)
 
 ## What this proved
 
@@ -133,7 +131,7 @@ The dashboard alone does not prove blocking or detection. It only confirms that 
 
 DVWA was also reachable in the lab.
 
-![DVWA Login Success](screenshots/02_DVWA_Login_Success.png)
+![Lab Screenshot](screenshots/02_DVWA_Login_Success.png)
 
 ## What this proved
 
@@ -145,7 +143,7 @@ DVWA was used as the intentionally vulnerable application for web security valid
 
 DVWA access was also validated through the SafeLine-protected path.
 
-![DVWA Protected via SafeLine WAF](screenshots/03_DVWA_Protected_via_SafeLine_WAF.png)
+![Lab Screenshot](screenshots/03_DVWA_Protected_via_SafeLine_WAF.png)
 
 ## What this proved
 
@@ -159,7 +157,7 @@ This matters because a WAF should still allow legitimate application traffic whi
 
 SafeLine-related logging was configured to forward syslog data toward the SIEM.
 
-![SafeLine Syslog Configuration](screenshots/04_SafeLine_Syslog_Configuration.png)
+![Lab Screenshot](screenshots/04_SafeLine_Syslog_Configuration.png)
 
 ## What this proved
 
@@ -175,7 +173,7 @@ This supports the claim that syslog forwarding was configured. It does not prove
 
 Security Onion showed received syslog events.
 
-![Security Onion Syslog Reception](screenshots/05_Security_Onion_Syslog_Reception.png)
+![Lab Screenshot](screenshots/05_Security_Onion_Syslog_Reception.png)
 
 ## What this proved
 
@@ -189,7 +187,7 @@ This confirmed that syslog data was being received and indexed. The screenshot s
 
 SafeLine attack records were queried directly from the PostgreSQL container.
 
-![SafeLine Attack Codes Extraction](screenshots/06_SafeLine_Attack_Codes_Extraction.png)
+![Lab Screenshot](screenshots/06_SafeLine_Attack_Codes_Extraction.png)
 
 ## Query Reviewed
 
@@ -229,7 +227,7 @@ This supports the claim that SafeLine stored useful attack metadata in its Postg
 
 An Elastic detection rule was configured to match selected SafeLine attack-type codes in log messages.
 
-![Elastic Detection Rule Configuration](screenshots/07_Elastic_Detection_Rule_Configuration.png)
+![Lab Screenshot](screenshots/07_Elastic_Detection_Rule_Configuration.png)
 
 ## Rule Logic
 
@@ -263,7 +261,7 @@ This supports custom detection logic based on observed SafeLine log content. It 
 
 OWASP ZAP was used to generate automated web testing traffic against the SafeLine-facing application path.
 
-![ZAP Fuzzer Traffic](screenshots/08a_ZAP_Fuzzer_Traffic.png)
+![Lab Screenshot](screenshots/08a_ZAP_Fuzzer_Traffic.png)
 
 ## What this proved
 
@@ -286,7 +284,7 @@ The screenshot does not prove that the Kali VM froze or that every ZAP finding w
 
 SafeLine rate-limiting behavior was reviewed after repeated web requests.
 
-![WAF Rate Limiting Backend](screenshots/08b_WAF_Rate_Limiting_Backend.png)
+![Lab Screenshot](screenshots/08b_WAF_Rate_Limiting_Backend.png)
 
 ## What this proved
 
@@ -312,7 +310,7 @@ The evidence supports rate-limiting behavior in this lab. It should not be descr
 
 Security Onion Hunt was used to search for XSS-related activity.
 
-![Suricata XSS Alert](screenshots/09_Suricata_XSS_Alert.png)
+![Lab Screenshot](screenshots/09_Suricata_XSS_Alert.png)
 
 ## What this proved
 
@@ -334,7 +332,7 @@ The screenshot supports XSS-related hunt visibility. It should not be overstated
 
 Security Onion Hunt was also used to review successful event activity.
 
-![HTTP Success Validation](screenshots/10_HTTP_Success_Validation.png)
+![Lab Screenshot](screenshots/10_HTTP_Success_Validation.png)
 
 ## What this proved
 
@@ -376,7 +374,7 @@ This created a basic lab workflow for reviewing web attack activity from multipl
 
 ---
 
-## Key Findings
+## Key Findings & Analysis
 
 ### 1. DVWA was reachable through the lab web path
 
